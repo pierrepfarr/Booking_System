@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "reservation-system"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+
+[tool.poetry.dependencies]
+python = "^3.7.1"
+requests = "^2.25.1"
+fastapi = "^0.65.1"
+regex = "^2021.4.4"
+uvicorn = "^0.13.4"
+pytest = "^6.2.4"
+pandas = "^1.2.4"
+tabulate = "^0.8.9"
+
+[tool.poetry.dev-dependencies]
+pytest-mock = "^3.6.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
