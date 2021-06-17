@@ -1,10 +1,6 @@
 import sys
 import sqlite3
-import json
-import regex as re
 import random
-import atexit
-import os,hashlib
 import datetime as dt
 import calendar
 from collections import namedtuple
@@ -45,7 +41,7 @@ def client_edit_name(client,new_name):
         return True
     return False
 
-def client_add_balance(client,amount):
+def add_balance(client,amount):
     sql = "select count(*) from clients where Name = ?"
     db.curs.execute(sql,(client,))
     result = db.curs.fetchone()
@@ -61,7 +57,7 @@ def client_add_balance(client,amount):
         return True
     return False
 
-def client_sub_balance(client,amount):
+def sub_balance(client,amount):
     sql = "select count(*) from clients where Name = ?"
     db.curs.execute(sql,(client,))
     result = db.curs.fetchone()
@@ -102,7 +98,6 @@ def client_activate(client):
 
 """ Client Queries """
 
-
 def list_all_clients():
     db.curs.execute('SELECT Name from clients')
     reservations = db.curs.fetchall()
@@ -110,7 +105,6 @@ def list_all_clients():
     for res in reservations:
         client_list.append(res[0])
     return client_list    
-
 
 def list_client(client,start_dt,end_dt):
     client_id = get_client_id(client)
@@ -123,28 +117,21 @@ def list_client(client,start_dt,end_dt):
         trans_list.append(res_str)
     return trans_list
 
+def list_all_client_reservations(client):
+    client_id = get_client_id(client)
+    sql_query = "SELECT * FROM reservations WHERE Client_ID = ?"
+    db.curs.execute(sql_query,(client_id,))
+    result = db.curs.fetchall()
+    trans_dict = {'reservations':[],'totals':[],"refunds":[],'facility':[],'status':[]}
+    for res in result:
+        trans_dict['reservations'].append(f'{res[0]}')
+        trans_dict['totals'].append(f'{res[8]}')
+        trans_dict['refunds'].append(f'{res[9]}')
+        trans_dict['facility'].append(f'{res[11]}')
+        trans_dict['status'].append(f'{res[7]}')        
+    
+    return trans_dict
 
-
-
-def is_client_exist(client):
-    sql = "select count(*) from clients where Name = ?"
-    db.curs.execute(sql,(client,))
-    result = db.curs.fetchone()
-    if result[0]==1:
-        return True
-    return False
-
-def is_client_active(client):
-    sql = "select count(*) from clients where Name = ?"
-    db.curs.execute(sql,(client,))
-    result = db.curs.fetchone()
-    if result[0]==1:
-        sql = "select Status from clients where Name = ?"
-        db.curs.execute(sql,(client,))
-        result = db.curs.fetchone()
-        status = result[0]
-        return status == "Active"
-    return False
 
 def get_client_balance(client):
     sql = "select count(*) from clients where Name = ?"

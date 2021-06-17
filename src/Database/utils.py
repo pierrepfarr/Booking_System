@@ -162,7 +162,6 @@ def is_client_active(client):
     return False
 
 
-
 def add_time(equipment,date,start,end,res_id):
     sql = f"insert into '{equipment}' (Date, Time, ID) values (?,?,?)"
     time = start
