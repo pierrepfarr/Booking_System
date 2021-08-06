@@ -1,53 +1,22 @@
-# Assignment 1
-
-# Virtual environment and dependency management
-
-We use poetry (https://python-poetry.org/docs/) to manage our project's packaging and dependency.
-
-1. Install poetry:
-
-osx / linux / bashonwindows install instructions
-```bash
-curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-```
-windows powershell install instructions
-```bash
-(Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py -UseBasicParsing).Content | python -
-```
-2. Install dependencies
-```bash
-source $HOME/.poetry/env
-```
-```bash
-poetry install
-```
-3. Activate virtual environment:
-```bash
-poetry shell
-```
-4. Run the scripts like usual in the right folder:
-
-Go to ./src to run client_console.py: See Usage
-
-Go to ./src to run fastapi:
-```bash
-uvicorn main:app --reload
-```
-Go to ./tests to run pytest:
-```bash
-pytest
-```
+# Reservation System
 
 ## Description
 
-Contained is our MPCS reservation management system. 
+This is a simple reservation system with a command line interface that uses an API to communicate with a SQLite database. Purpose was to practice OOP, learn about API creation, and working with multiple layers.
 
-## Usage and How it Works
+# Usage and How it Works
+
+## Dependencies
+I am using poetry (https://python-poetry.org/docs/) to manage project packaging and dependency. Check out the lock file for further detail.
+
+## FastAPI (main.py)
 Run out of src/ uvicorn main:app --reload and uncomment/change the server location if you want to run locally
 
 If not you can run the program and it will try to interact with our linux machine.
 
-### client_console - is our command line interface that prompts the user to input commands.
+## Client_Console 
+
+is our command line interface that prompts the user to input commands.
 
 The console begins requesting a login, the programs starts with a default user that has the details
 
@@ -73,67 +42,26 @@ If you wish to disable client logins at runtime run the file with the command ar
 
 If you wish to run the program allowing for remote hold request to be place use command args --allow_holds y
 
-### main.py - our FastAPI app file
+## Database (api_lite.py)
 
-This is our FastAPI app that listens for requests and sends calls to our database.
-
-example to run
-
-run out of src/
-uvicorn main:app --reload
-
-
-### api_lite.py - our database and logic
-
-This is our business logic handles queries and that stores reservations in the reservations table and store our space object data in the spaces table.
-
-### specialized_client.py 
-Our command line interface for the specialized clients:
-
-Has two users:
-
-Spencer, password: 123
-
-Peter, password: 123
-
-Can follow this command line format when making inputs: 
-"Enter client name: "
-"Enter request (eg: workshop1): "
-"Enter start_date (YYYY-MM-DD): "
-"Enter start_time (HH:MM): "
-"Enter end_time (HH:MM): "
+The business logic handles queries and that stores reservations information.
 
 ## Tests
 
-To run our tests you can run pytest out of the /tests directory or run python -m pytest ../tests out of the /src directory
+To run the test suite
 
-To run an indiviual test file you can run pytest --filename ex. pytest test_api.py
+```bash
+$Home/tests pytest 
+```
+or 
+
+```bash
+$Home/src python -m pytest 
+```
 
 ## Docs
 
-you can view FastAPI swagger docs by navigating to the server and the "http://linux3.cs.uchicago.edu:51223"/docs endpoint
-
-details of the API can be found in the Api.pdf file
-
-## Notes/Features To Point Out
-
--- New toggle Dashboard for admin
-
--- Dynamic toggle of client login and add funds
-
--- New clientside validation for inputs (role,time,request,funds)
-
--- New console tests
-
--- New hold functionality
-
--- Improved information output
-
--- Made sure client info follows name changes
-
--- Better error handling
-
--- Seperate cancelled reservations from reservations and transactions
+You can view FastAPI swagger docs by navigating to the server and the /docs endpoint
 
 
 
