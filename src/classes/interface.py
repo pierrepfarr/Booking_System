@@ -6,7 +6,7 @@ class Interface:
     
     admin_actions = {"1": "Book Reservation", "2": "Cancel Reservation", "3": "Modify Reservation",
                      "4": "Get Reservation Details", "5": "List Clients", "6": "List Reservations", 
-                     "7": "List Transactions", "8":"Create Client", "9":"Edit Client","10":"Dashboard","11":"List Holds"}
+                     "7": "List Transactions", "8":"Create Client", "9":"Edit Client","10":"Dashboard"}
     
     client_actions = {"1": "Book Reservation", "2": "Cancel Reservation", "3": "Modify Reservation",
                      "4": "List Reservations", "5": "List Transactions", "6": "Show Balance", 
@@ -16,12 +16,11 @@ class Interface:
                      'irradiator1', 'irradiator2', 'polymer extruder1', 'polymer extruder2',
                      'high velocity crusher', '1.21 gigawatt lightning harvester']
 
-    def __init__(self,holds=False):
+    def __init__(self):
         self.welcome = "Welcome to MPCS Reservation System!"
         self.again = 'y'
         self.user = "admin"
         self.role = "admin"
-        self.holds = holds
         self.admin_choice_prompts = {"Book Reservation":self.prompt_make,
                                      "Cancel Reservation":self.prompt_cancel,
                                      "Modify Reservation":self.prompt_modify,
@@ -40,8 +39,7 @@ class Interface:
                                      "Deactivate":self.prompt_deactivate,
                                      "Toggle Funds":self.prompt_toggle,
                                      "Toggle Login":self.prompt_toggle,
-                                     "Show Toggles":self.prompt_show_toggles,
-                                     "List Holds":self.prompt_list_holds
+                                     "Show Toggles":self.prompt_show_toggles
                                      }
         
         self.client_choice_prompts = {"Book Reservation":self.prompt_make,
@@ -85,19 +83,19 @@ class Interface:
     def prompt_admin(self):
         print("Select which action would you like to perform: ")
         
-        for i in range(1,12):
+        for i in range(1,11):
             print(f'{i}.{self.admin_actions[str(i)]}')
             
         while True:
             choice = input("Enter a number: ")
             try:
-                if int(choice) in range(1,12):
+                if int(choice) in range(1,11):
                     break
                 else:
-                    print("Please choose 1-11!")
+                    print("Please choose 1-10!")
                     continue
             except:
-                 print("Please choose 1-11!")
+                 print("Please choose 1-10!")
                  continue
         
         if int(choice) in [6,7]:
@@ -205,7 +203,7 @@ class Interface:
         res_end = self.valid_time(res_end)
         data['res_end'] = res_end
 
-        return [data,self.holds]
+        return [data]
 
 
     def prompt_cancel(self):
@@ -376,9 +374,6 @@ class Interface:
     def prompt_show_toggles(self):
         return None
 
-    def prompt_list_holds(self):
-        return None
-
     def valid_date(self,date):
         valid = self.check_date(date)
 
@@ -428,7 +423,7 @@ class Interface:
             if valid:
                 break
             else:
-                print("Please choose client, admin, or hold_admin")
+                print("Please choose client or admin")
                 continue
         return request 
 
@@ -456,4 +451,4 @@ class Interface:
             return False 
 
     def check_role(self,role):
-        return role in ["client","admin","hold_admin"]
+        return role in ["client","admin"]

@@ -20,14 +20,4 @@ class Client(BaseModel):
 class Login(BaseModel):
     username: str
     password: str
-
-
-class Hold(BaseModel):
-    username: str 
-    password: str
-    client_name: str
-    request: str
-    start_date: str
-    start_time: str
-    end_time: str
     

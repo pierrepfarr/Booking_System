@@ -6,26 +6,14 @@ from typing import Optional
 
 sys.path.append('../Database')
 import api_lite as api
-from models import Item, Client, Login, Hold
+from models import Item, Client, Login
 
 app = FastAPI()
 api.db = api.open_db()
 
 admin_args = {"name":"Manager","password":"admin","status":"active","balance":0,"role":"admin"}
-team1_args = {"name":"team1","password":"password1","status":"active","balance":0,"role":"hold_admin"}
-team2_args = {"name":"team2","password":"password2","status":"active","balance":0,"role":"hold_admin"}
-team4_args = {"name":"team4","password":"password4","status":"active","balance":0,"role":"hold_admin"}
-team5_args = {"name":"team5","password":"password5","status":"active","balance":0,"role":"hold_admin"}
-spencer_args = {"name":"Spencer","password":"123","status":"active","balance":0,"role":"hold_admin"}
-peter_args = {"name":"Peter","password":"123","status":"active","balance":0,"role":"hold_admin"}
 
 default_admin = api.create_client(admin_args)
-team1 = api.create_client(team1_args)
-team2 = api.create_client(team2_args)
-team4 = api.create_client(team4_args)
-team5 = api.create_client(team5_args)
-spencer = api.create_client(spencer_args)
-peter = api.create_client(peter_args)
 
 @app.get("/")
 async def read_root():
@@ -42,64 +30,6 @@ async def app_login(login: Login):
         return {"Result": result}
     else:
         return {"Result": "Not Found"}
-
-@app.post("/hold")
-async def post_hold(hold: Hold):
-    args = hold.dict()
-    result = api.create_hold(args)
-
-    if result:
-        return {
-                "success": True,
-                "message": "Your hold was placed",
-                "facility_name": "Team_3_Chicago"
-                }
-    else:
-        return {
-                "success": False,
-                "message": "Your hold could not be placed",
-                }
-
-@app.post("/hold/charge")
-async def post_hold_charge(item:Item):
-    args = item.dict()
-    result = api.charge_hold(args)
-
-    if result:
-        return {
-                "Status": ["Reservation Held"],
-                "ID": [f'{result.id}'],
-                "Date": [f'{result.st_dt}'],
-                "Cost": [f'{result.cost}'],
-                "Facility": [f'{result.location}']
-                }
-    else:
-        return {"Status": ["Your Reservation is Unavailable"]}
-
-@app.delete("/hold")
-async def delete_hold(hold: Hold):
-    args = hold.dict()
-    result = api.delete_hold(args)
-
-    if result:
-        return {
-                "success": True,
-                "message": "Your hold was deleted",
-                }
-    else:
-        return {
-                "success": False,
-                "message": "Your hold could not be deleted",
-                }
-
-@app.get("/hold")
-async def get_hold_list():
-    hold_list = api.get_holds()
-    if hold_list:
-        return {'holds_lst': hold_list}
-    else:
-        return{'holds_lst': ['No holds']}
-
 
 @app.get("/reservations")
 async def get_reservations_list():

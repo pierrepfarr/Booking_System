@@ -10,11 +10,9 @@ from tabulate import tabulate
 from classes.interface import Interface
 from actions import fetch_login,actions
 
-def main(logins,holds,funds):
-    if holds == "n":
-        interface = Interface()
-    if holds == "y":
-        interface = Interface(holds=True)
+def main(logins,funds):
+
+    interface = Interface()
 
     print(interface.welcome)
 
@@ -114,8 +112,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Interface for Booking App")
     parser.add_argument('--allow_logins', metavar='allow_logins', choices=[
                     'y','n'], help="allow logins flag")
-    parser.add_argument('--allow_holds', metavar='allow_holds', choices=[
-                'y','n'], help="allow holds flag")
     args = parser.parse_args()
     
     if args.allow_logins != None:
@@ -123,17 +119,12 @@ if __name__ == "__main__":
     else:
         logins_flag = 'y'
     
-    if args.allow_holds != None:
-        holds_flag = args.allow_holds
-    else:
-        holds_flag = 'n'
-
     funds_flag = 'y'
 
     running = "yes"
 
     while running == "yes":
-        main(logins=logins_flag,holds=holds_flag,funds=funds_flag)
+        main(logins=logins_flag,funds=funds_flag)
         print('\n')
         while True:
             new_login = input("Would you like to login into a new account? [y/n]: ")

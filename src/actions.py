@@ -4,28 +4,10 @@ import requests
 import random
 from requests.models import Response
 
-
-
-team1 = {"port":"51221",
-         "machine":"linux1"}
-team2 = {"port":"51222",
-         "machine":"linux2"}
-team4 = {"port":"51224",
-         "machine":"linux4"}
-team5 = {"port":"51225",
-         "machine":"linux5"}
-
-teams = {"team1":team1,
-         "team2":team2,
-         "team4":team4,
-         "team5":team5
-         }
 server = "http://127.0.0.1:8000"
-
 
 def to_dt_format(str_date):
     return dt.datetime.strptime(str_date, "%Y-%m-%d").date()
-
 
 def fetch_login(username:str,password:str):
     my_data = {"username": username,
@@ -34,76 +16,10 @@ def fetch_login(username:str,password:str):
     response = requests.put(url,json=my_data)
     return response
 
-def make_hold(data:dict,team:dict):
-    my_data = data
-    server = f"http://{team['machine']}.cs.uchicago.edu:{team['port']}"
-    url = server + \
-        f"/hold"
-    response = requests.post(url,json=my_data)
-    return response
-
-def cancel_hold(data:dict,team:dict):
-    my_data = data
-    server = f"http://{team['machine']}.cs.uchicago.edu:{team['port']}"
-    url = server + \
-        f"/hold"
-    response = requests.delete(url,json=my_data)
-    return response
-
-def list_all_holds(input=None):
-    url = server + \
-        f"/hold"
-    
-    response = requests.get(url)
-    return response
-
 def make_res(input_list:list):
     my_data = input_list[0]
-    if input_list[1] == False:
-        url = server + \
-            f"/reservations"
-
-        response = requests.post(url, json = my_data)
-        return response
-    else:
-        url = server + \
-            f"/reservations"
-
-        response = requests.post(url, json = my_data)
-        if response.json()['Status'] == ["Reservation Confirmed"]:  
-            return response  
-        elif response.json()['Status'] == ["Please Create Client"]:
-            return response
-        elif response.json()['Status'] == ["Your booking ability is not active"]:
-            return response
-        else:
-            hold_data = {
-                    "username": 'team3',
-                    "password": 'password3',
-                    "client_name":my_data['client'],
-                    "request":my_data['request'],
-                    "start_date":my_data['start_date'],
-                    "start_time":my_data['res_start'],
-                    "end_time":my_data['res_end']}
-            
-            keys = list(teams.keys())
-            while keys:
-                try:
-                    key = random.choice(keys)
-                    hold_result = make_hold(hold_data,teams[key])
-                    if hold_result.json()['success'] == True:
-                        return hold_result
-                    else:
-                        keys.remove(key)
-                except:
-                    keys.remove(key)
-                    continue
-        return response 
-
-def charge_hold(data:dict):
-    my_data = data
     url = server + \
-        f"/hold/charge"
+        f"/reservations"
 
     response = requests.post(url, json = my_data)
     return response
@@ -233,7 +149,5 @@ actions = { "Book Reservation":make_res,
             "Deactivate":deactivate,
             "List Reservations":list_res_client,
             "List Transactions":list_res_client,
-            "Show Balance":show_funds,
-            "Charge Hold":charge_hold,
-            "List Holds":list_all_holds
+            "Show Balance":show_funds
             }
