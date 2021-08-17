@@ -4,16 +4,15 @@ import atexit
 from fastapi import FastAPI, Response
 from typing import Optional
 
-sys.path.append('../Database')
-import api_lite as api
+import database as api
 from models import Item, Client, Login
 
 app = FastAPI()
-api.db = api.open_db()
+db = api.open_db()
 
 admin_args = {"name":"Manager","password":"admin","status":"active","balance":0,"role":"admin"}
 
-default_admin = api.create_client(admin_args)
+default_admin = api.create_client(db,admin_args)
 
 @app.get("/")
 async def read_root():
@@ -24,7 +23,7 @@ async def app_login(login: Login):
     args = login.dict()
     user = args['username']
     password = args['password']
-    result = api.check_login(user,password)
+    result = api.is_valid_login(db,user,password)
 
     if result:
         return {"Result": result}
@@ -33,7 +32,7 @@ async def app_login(login: Login):
 
 @app.get("/reservations")
 async def get_reservations_list():
-    res_list = api.list_all_reservations()
+    res_list = api.list_all_reservations(db)
     if res_list:
         return {'ids_lst': res_list}
     else:
@@ -43,7 +42,7 @@ async def get_reservations_list():
 @app.post("/reservations")
 async def post_reservation(item: Item):
     args = item.dict()
-    result = api.create_res(args)
+    result = api.create_res(db,args)
 
     if result == "Please Create Client":
         return {"Status":[result]}
@@ -64,7 +63,7 @@ async def post_reservation(item: Item):
 
 @app.delete("/reservations/{res_id}")
 async def delete_reservation(res_id,response: Response):
-    result = api.delete_res(res_id)
+    result = api.delete_res(db,res_id)
     
     if result:
         return{'Message': ['The reservation was cancelled']}
@@ -74,7 +73,7 @@ async def delete_reservation(res_id,response: Response):
 @app.put("/reservations/{res_id}")
 async def modify_reservation(res_id,item: Item):
     args = item.dict()
-    result = api.modify_reservation(res_id,args)
+    result = api.modify_reservation(db,res_id,args)
 
     if result:
         return {
@@ -90,7 +89,7 @@ async def modify_reservation(res_id,item: Item):
 @app.get("/reservations/{res_id}")
 async def get_reservation(res_id):
 
-    result= api.get_reservation(res_id)
+    result= api.get_reservation(db,res_id)
 
     if result:
         return {
@@ -106,7 +105,7 @@ async def get_reservation(res_id):
 
 @app.get("/clients")
 async def get_clients_list():
-    client_list = api.list_all_clients()
+    client_list = api.list_all_clients(db)
     if client_list:
         return {'ids_lst': client_list}
     else:
@@ -115,7 +114,7 @@ async def get_clients_list():
 @app.get("/clients/{client}")
 async def get_client_balance(client,balance:Optional[str] = None):
     if balance == "true":
-        result = api.get_client_balance(client)
+        result = api.get_client_balance(db,client)
     if result:
         return {'Client': [result[0]],
                 'Balance': [result[1]]}
@@ -126,7 +125,7 @@ async def get_client_balance(client,balance:Optional[str] = None):
 @app.post("/clients")
 async def post_client(client: Client):
     args = client.dict()
-    result = api.create_client(args)
+    result = api.create_client(db,args)
 
     if result:
         return {"Status": ["Client Created"]}
@@ -140,20 +139,20 @@ async def update_client(client,new_name:Optional[str] = None,add:Optional[float]
     result = False
 
     if new_name and not (add or sub or status):
-        result = api.client_edit_name(client,new_name)
+        result = api.client_edit_name(db,client,new_name)
 
     if add and not (new_name or sub or status):
-        result = api.client_add_balance(client,add)
+        result = api.client_add_balance(db,client,add)
 
     if sub and not (new_name or add or status):
-        result = api.client_sub_balance(client,sub)
+        result = api.client_sub_balance(db,client,sub)
 
     if status and not (new_name or add or sub):
         if status == "Activate":
-            result = api.client_activate(client)
+            result = api.client_activate(db,client)
         
         if status == "Deactivate":
-            result = api.client_deactivate(client)
+            result = api.client_deactivate(db,client)
 
     if result:
         return {"Message": ["Client updated"]}
@@ -167,7 +166,7 @@ async def list_all_request(lst_type, client:Optional[str] = None):
     
     if lst_type == "client":
         if client:
-            result = api.list_all_client_reservations(client)
+            result = api.list_all_client_reservations(db,client)
             if result:
                 return {
                         "Reservations": result['reservations'],
@@ -182,7 +181,7 @@ async def list_all_request(lst_type, client:Optional[str] = None):
             return {"Message":["No client was listed"]}
 
     if lst_type == "transactions":
-        result = api.list_all_transactions()
+        result = api.list_all_transactions(db)
         if result:
             return {
                     "Reservations": result['reservations'],
@@ -202,7 +201,7 @@ async def list_range_request(lst_type, start_dt, end_dt,client:Optional[str] = N
 
     if lst_type == "client":
         if client:
-            result = api.list_client(client,start_dt,end_dt)
+            result = api.list_client(db,client,start_dt,end_dt)
             if result:
                 return {"result_list": result}
             else:
@@ -211,7 +210,7 @@ async def list_range_request(lst_type, start_dt, end_dt,client:Optional[str] = N
             return {"Message":["No Client was listed"]}
 
     if lst_type == "transactions":
-        result = api.list_transactions(start_dt,end_dt)
+        result = api.list_transactions(db,start_dt,end_dt)
         if result:
             return {
                     "Reservations": result['reservations'],
@@ -225,7 +224,7 @@ async def list_range_request(lst_type, start_dt, end_dt,client:Optional[str] = N
             return{"Message":["No Results Found"]}
     
     if lst_type == "reservations":
-        result = api.list_reservations(start_dt,end_dt)
+        result = api.list_reservations(db,start_dt,end_dt)
         if result:
             return {"Reservations": result}
         else:

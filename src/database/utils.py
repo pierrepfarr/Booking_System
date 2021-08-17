@@ -7,13 +7,13 @@ import datetime as dt
 from collections import namedtuple
 
 sys.path.append('../src/classes')
-from reservation import Reserve
+from reservation_cls import Reserve
 
 equipment_lst = ['workshop1','workshop2','workshop3','workshop4','"mini microvac1"','"mini microvac2"',
                     'irradiator1', 'irradiator2', '"polymer extruder1"', '"polymer extruder2"',
                     '"high velocity crusher"', '"1.21 gigawatt lightning harvester"']
 
-DB_FILE = "../Database/reservations.db"
+DB_FILE = "../src/reservations.db"
 
 def open_db(database_file=DB_FILE):
     conn = sqlite3.connect(DB_FILE)
@@ -80,7 +80,7 @@ def gen_res_id(date,id_lst):
     return new_id
 
 
-def get_client_ids():
+def get_client_ids(db):
     db.curs.execute('SELECT ID from clients')
     reservations = db.curs.fetchall()
     client_list = []
@@ -107,7 +107,7 @@ def generate_hash(password,salt=None):
     )
     return salt, hashed 
 
-def is_valid_login(user,password):
+def is_valid_login(db,user,password):
     sql = "select Hash, Salt, Role from clients where Name = ?"
     db.curs.execute(sql,(user,))
     result = db.curs.fetchone()
@@ -120,7 +120,7 @@ def is_valid_login(user,password):
         return result[2]
     return False
 
-def is_available(equipment,date,start,end):
+def is_available(db,equipment,date,start,end):
     sql = f"SELECT * FROM '{equipment}' WHERE Date = ? AND Time BETWEEN ? AND ?"
     db.curs.execute(sql,(date,start,(end-.5)))
     result = db.curs.fetchall()
@@ -128,7 +128,7 @@ def is_available(equipment,date,start,end):
         return False
     return "Free"    
 
-def is_admin(client):
+def is_admin(db,client):
     sql = "select count(*) from clients where Name = ?"
     db.curs.execute(sql,(client,))
     result = db.curs.fetchone()
@@ -141,7 +141,7 @@ def is_admin(client):
     
     return False
 
-def is_client_exist(client):
+def is_client_exist(db,client):
     sql = "select count(*) from clients where Name = ?"
     db.curs.execute(sql,(client,))
     result = db.curs.fetchone()
@@ -149,7 +149,7 @@ def is_client_exist(client):
         return True
     return False
 
-def is_client_active(client):
+def is_client_active(db,client):
     sql = "select count(*) from clients where Name = ?"
     db.curs.execute(sql,(client,))
     result = db.curs.fetchone()
@@ -162,7 +162,7 @@ def is_client_active(client):
     return False
 
 
-def add_time(equipment,date,start,end,res_id):
+def add_time(db,equipment,date,start,end,res_id):
     sql = f"insert into '{equipment}' (Date, Time, ID) values (?,?,?)"
     time = start
     while time < end:
@@ -170,7 +170,7 @@ def add_time(equipment,date,start,end,res_id):
         time += .5
     db.conn.commit()
 
-def delete_time(equipment,date,start,end):
+def delete_time(db,equipment,date,start,end):
     sql = f"DELETE from '{equipment}' WHERE Date=? and Time=?"
     time = start
     while time < end:

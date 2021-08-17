@@ -1,6 +1,4 @@
 import sys
-import sqlite3
-import random
 import datetime as dt
 import calendar
 import utils 
@@ -9,9 +7,10 @@ import client
 sys.path.append('../src/classes')
 from collections import namedtuple
 from reservation_cls import Reserve
+
 """ Reservation Functionality """
 
-def create_res(args):
+def create_res(db,args):
     create_date = args['create_date']
     start_date = args['start_date']
     int_st = time_chg(args['res_start'])
@@ -69,7 +68,7 @@ def create_res(args):
     
     return False
 
-def delete_res(res_id):
+def delete_res(db,res_id):
     sql = "select count(*) from reservations where ID = ?"
     db.curs.execute(sql,(res_id,))
     result = db.curs.fetchone()
@@ -91,7 +90,7 @@ def delete_res(res_id):
         return True
     return False    
 
-def modify_reservation(res_id,args):
+def modify_reservation(db,res_id,args):
     client_id = client.get_client_id(args['client'])
 
     sql = "select count(*) from reservations where ID = ?"
@@ -158,7 +157,7 @@ def modify_reservation(res_id,args):
 
 """ Reservation Queries """
 
-def list_all_reservations():
+def list_all_reservations(db):
     db.curs.execute('SELECT rowid, ID from reservations')
     reservations = db.curs.fetchall()
     id_list = []
@@ -166,7 +165,7 @@ def list_all_reservations():
         id_list.append(res[1])
     return id_list
 
-def list_reservations(start_dt,end_dt):
+def list_reservations(db,start_dt,end_dt):
     sql_query = "SELECT * FROM reservations WHERE Start_dt BETWEEN ? AND ?"
     db.curs.execute(sql_query,(start_dt,end_dt))
     result = db.curs.fetchall()
@@ -177,7 +176,7 @@ def list_reservations(start_dt,end_dt):
     return res_list  
 
 
-def get_reservation(res_id):
+def get_reservation(db,res_id):
     db.curs.execute( f"select count(*) from reservations where ID = {res_id}")
     result = db.curs.fetchone()
     if result[0] == 1:
@@ -191,7 +190,7 @@ def get_reservation(res_id):
     
     return False   
 
-def list_all_transactions():
+def list_all_transactions(db):
     sql = 'SELECT * from reservations where Status != "Hold"'
     db.curs.execute(sql)
     result = db.curs.fetchall()
@@ -205,7 +204,7 @@ def list_all_transactions():
     
     return trans_dict
 
-def list_transactions(start_dt,end_dt):
+def list_transactions(db,start_dt,end_dt):
     sql_query = "SELECT * FROM reservations WHERE Start_dt BETWEEN ? AND ? AND Status != 'Hold'"
     db.curs.execute(sql_query,(start_dt,end_dt))
     result = db.curs.fetchall()

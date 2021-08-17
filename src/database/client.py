@@ -1,25 +1,23 @@
-import sys
-import sqlite3
-import random
 import datetime as dt
-import calendar
+import reservation
+import utils
 from collections import namedtuple
 
 """ Client functionality """
 
-def create_client(args):
+def create_client(db,args):
     name = args['name']
     password = args['password']
     status = args['status']
     balance = args['balance']
     role = args['role']
 
-    exist = check_client_exist(name)
+    exist = utils.is_client_exist(db,name)
     
     if not exist:
-        salt,hash_result = generate_hash(password)
-        id_lst = list_all_client_ids()
-        new_id = gen_client_id(name,id_lst)
+        salt,hash_result = utils.generate_hash(password)
+        id_lst = utils.get_client_ids(db)
+        new_id = utils.gen_client_id(name,id_lst)
         sql = f"insert into clients (Name, Hash,Salt, Status, Balance,Role,ID) values (?,?,?,?,?,?,?)"
         db.curs.execute(sql,(name,hash_result,salt,status,balance,role,new_id))
         db.conn.commit()
@@ -27,8 +25,8 @@ def create_client(args):
         return True
     return False
 
-def client_edit_name(client,new_name):
-    check_new_exist = check_client_exist(new_name)
+def client_edit_name(db,client,new_name):
+    check_new_exist = utils.is_client_exist(new_name)
     if check_new_exist:
         return False
     sql = "select count(*) from clients where Name = ?"
@@ -41,7 +39,7 @@ def client_edit_name(client,new_name):
         return True
     return False
 
-def add_balance(client,amount):
+def add_balance(db,client,amount):
     sql = "select count(*) from clients where Name = ?"
     db.curs.execute(sql,(client,))
     result = db.curs.fetchone()
@@ -57,7 +55,7 @@ def add_balance(client,amount):
         return True
     return False
 
-def sub_balance(client,amount):
+def sub_balance(db,client,amount):
     sql = "select count(*) from clients where Name = ?"
     db.curs.execute(sql,(client,))
     result = db.curs.fetchone()
@@ -73,7 +71,7 @@ def sub_balance(client,amount):
         return True
     return False
 
-def client_deactivate(client):
+def client_deactivate(db,client):
     sql = "select count(*) from clients where Name = ?"
     db.curs.execute(sql,(client,))
     result = db.curs.fetchone()
@@ -84,7 +82,7 @@ def client_deactivate(client):
         return True
     return False
 
-def client_activate(client):
+def client_activate(db,client):
     sql = "select count(*) from clients where Name = ?"
     db.curs.execute(sql,(client,))
     result = db.curs.fetchone()
@@ -98,7 +96,7 @@ def client_activate(client):
 
 """ Client Queries """
 
-def list_all_clients():
+def list_all_clients(db):
     db.curs.execute('SELECT Name from clients')
     reservations = db.curs.fetchall()
     client_list = []
@@ -106,7 +104,7 @@ def list_all_clients():
         client_list.append(res[0])
     return client_list    
 
-def list_client(client,start_dt,end_dt):
+def list_client(db,client,start_dt,end_dt):
     client_id = get_client_id(client)
     sql_query = "SELECT * FROM reservations WHERE Start_dt BETWEEN ? AND ? AND Client_ID = ? AND Status !='Hold'"
     db.curs.execute(sql_query,(start_dt,end_dt,client_id))
@@ -117,7 +115,7 @@ def list_client(client,start_dt,end_dt):
         trans_list.append(res_str)
     return trans_list
 
-def list_all_client_reservations(client):
+def list_all_client_reservations(db,client):
     client_id = get_client_id(client)
     sql_query = "SELECT * FROM reservations WHERE Client_ID = ?"
     db.curs.execute(sql_query,(client_id,))
@@ -133,7 +131,7 @@ def list_all_client_reservations(client):
     return trans_dict
 
 
-def get_client_balance(client):
+def get_client_balance(db,client):
     sql = "select count(*) from clients where Name = ?"
     db.curs.execute(sql,(client,))
     result = db.curs.fetchone()
@@ -145,7 +143,7 @@ def get_client_balance(client):
     
     return False
 
-def get_client_id(client):
+def get_client_id(db,client):
     valid_client = check_client_exist(client)
     if valid_client:
         sql = "select ID from clients where Name = ?"
