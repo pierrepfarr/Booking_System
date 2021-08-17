@@ -2,7 +2,7 @@
 name = "Booking-System"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["ppfarr@uchicago.edu"]
 
 
 [tool.poetry.dependencies]
