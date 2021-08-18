@@ -26,7 +26,7 @@ def create_client(db,args):
     return False
 
 def client_edit_name(db,client,new_name):
-    check_new_exist = utils.is_client_exist(new_name)
+    check_new_exist = utils.is_client_exist(db,new_name)
     if check_new_exist:
         return False
     sql = "select count(*) from clients where Name = ?"
@@ -105,7 +105,7 @@ def list_all_clients(db):
     return client_list    
 
 def list_client(db,client,start_dt,end_dt):
-    client_id = get_client_id(client)
+    client_id = get_client_id(db,client)
     sql_query = "SELECT * FROM reservations WHERE Start_dt BETWEEN ? AND ? AND Client_ID = ? AND Status !='Hold'"
     db.curs.execute(sql_query,(start_dt,end_dt,client_id))
     result = db.curs.fetchall()
@@ -116,7 +116,7 @@ def list_client(db,client,start_dt,end_dt):
     return trans_list
 
 def list_all_client_reservations(db,client):
-    client_id = get_client_id(client)
+    client_id = get_client_id(db,client)
     sql_query = "SELECT * FROM reservations WHERE Client_ID = ?"
     db.curs.execute(sql_query,(client_id,))
     result = db.curs.fetchall()
@@ -144,7 +144,7 @@ def get_client_balance(db,client):
     return False
 
 def get_client_id(db,client):
-    valid_client = check_client_exist(client)
+    valid_client = utils.is_client_exist(db,client)
     if valid_client:
         sql = "select ID from clients where Name = ?"
         db.curs.execute(sql,(client,))

@@ -62,7 +62,6 @@ def main(logins,funds):
                     if response["Message"] == ["Client updated"]:
                         interface.user = action_input[1]
                 if choice == "Book Reservation":
-                    print(action_input[1])
                     try:
                         if response["success"] == True:
                             action_input[0]['facility'] = response['facility_name']

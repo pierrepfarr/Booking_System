@@ -96,8 +96,7 @@ async def get_reservation(res_id):
                 "Status": [f'{result.status}'],
                 "ID": [f'{result.id}'],
                 "Date": [f'{result.st_dt}'],
-                "Cost": [f'{result.cost}'],
-                "Refund": [f'{result.refund}'] 
+                "Cost": [f'{result.cost}']
                 }
     else:
         return{'Message': ['No reservations under that id']}

@@ -17,7 +17,7 @@ class Interface:
                      'high velocity crusher', '1.21 gigawatt lightning harvester']
 
     def __init__(self):
-        self.welcome = "Welcome to MPCS Reservation System!"
+        self.welcome = "Welcome to Lab Booking System!"
         self.again = 'y'
         self.user = "admin"
         self.role = "admin"
@@ -72,7 +72,7 @@ class Interface:
         
         return options[int(choice)-1]
     
-        #prompt for login
+    #prompt for login
     def prompt_login(self):
 
         username = input("Please Input A Username: ")

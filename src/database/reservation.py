@@ -13,13 +13,13 @@ from reservation_cls import Reserve
 def create_res(db,args):
     create_date = args['create_date']
     start_date = args['start_date']
-    int_st = time_chg(args['res_start'])
-    int_end = time_chg(args['res_end'])
+    int_st = utils.time_chg(args['res_start'])
+    int_end = utils.time_chg(args['res_end'])
     request = args['request'].lower()  
     facility = args['facility']  
     
-    is_client = utils.is_client_exist(args['client'])
-    is_active = utils.is_client_active(args['client'])
+    is_client = utils.is_client_exist(db,args['client'])
+    is_active = utils.is_client_active(db,args['client'])
 
     dt_date = utils.to_dt_format(start_date)
     day = calendar.day_name[dt_date.weekday()]
@@ -40,19 +40,19 @@ def create_res(db,args):
     if is_active == False:
         return "Your booking ability is not active"
 
-    status = utils.is_available(request,start_date,int_st,int_end)
+    status = utils.is_available(db,request,start_date,int_st,int_end)
     
     if status == "Free":
         res = Reserve(args['client'], request, create_date, start_date,
                       args['res_start'], args['res_end'])   
         
-        res_list = list_all_reservations()
+        res_list = list_all_reservations(db)
         new_id = utils.gen_res_id(res.st_dt,res_list)
         res.add_id(new_id)
         
-        utils.add_time(request,start_date,int_st,int_end,res.id)
+        utils.add_time(db,request,start_date,int_st,int_end,res.id)
 
-        client_id = client.get_client_id(args['client'])
+        client_id = client.get_client_id(db,args['client'])
         
         sql = "insert into reservations (ID, Client, Request, Create_dt, Start_dt,\
                Start_time, End_time, Status, Cost, Refund,Client_ID,Facility) values (?,?,?,?,?,?,?,?,?,?,?,?)"
@@ -62,7 +62,7 @@ def create_res(db,args):
         
         db.conn.commit()
 
-        edit_balance = client.sub_balance(res.client,res.cost)
+        edit_balance = client.sub_balance(db,res.client,res.cost)
 
         return res
     
@@ -79,19 +79,19 @@ def delete_res(db,res_id):
         res = Reserve(result[1],result[2],result[3],result[4],result[5],result[6])
         res.cancel()
         
-        utils.delete_time(res.req,res.st_dt,res.int_st,res.int_end)
+        utils.delete_time(db,res.req,res.st_dt,res.int_st,res.int_end)
         
         sql = '''UPDATE reservations SET Status = ?, Refund = ? WHERE ID = ?'''
         db.curs.execute(sql,(res.status,res.refund,res_id))
         db.conn.commit()
         
-        edit_balance = client.add_balance(res.client,res.refund)
+        edit_balance = client.add_balance(db,res.client,res.refund)
 
         return True
     return False    
 
 def modify_reservation(db,res_id,args):
-    client_id = client.get_client_id(args['client'])
+    client_id = client.get_client_id(db,args['client'])
 
     sql = "select count(*) from reservations where ID = ?"
     db.curs.execute(sql,(res_id,))
@@ -105,13 +105,13 @@ def modify_reservation(db,res_id,args):
         
         res = Reserve(result[1],result[2],result[3],result[4],result[5],result[6])
         
-        utils.delete_time(res.req,res.st_dt,res.int_st,res.int_end)
-        add_back_balance = client.add_balance(res.client,res.cost)
+        utils.delete_time(db,res.req,res.st_dt,res.int_st,res.int_end)
+        add_back_balance = client.add_balance(db,res.client,res.cost)
         
         create_date = args['create_date']
         start_date = args['start_date']
-        int_st = time_chg(args['res_start'])
-        int_end = time_chg(args['res_end'])
+        int_st = utils.time_chg(args['res_start'])
+        int_end = utils.time_chg(args['res_end'])
         request = args['request'].lower() 
         dt_date = utils.to_dt_format(start_date)
         day = calendar.day_name[dt_date.weekday()]
@@ -124,14 +124,14 @@ def modify_reservation(db,res_id,args):
         if int_st < 9 or int_end > 18:
             return False
         
-        status = utils.is_available(request,start_date,int_st,int_end)
+        status = utils.is_available(db,request,start_date,int_st,int_end)
         
         if status == "Free":
             res = Reserve(args['client'], request, create_date, start_date,
                           args['res_start'], args['res_end'])   
             
             res.add_id(res_id)
-            utils.add_time(request,start_date,int_st,int_end,res_id)
+            utils.add_time(db,request,start_date,int_st,int_end,res_id)
 
             sql = '''UPDATE reservations SET Client = ?, 
                      Request = ?,
@@ -148,7 +148,7 @@ def modify_reservation(db,res_id,args):
                                   res.end_time,res.status,res.cost,0,res.id))
             db.conn.commit()
             
-            edit_balance = client.sub_balance(res.client,res.cost)
+            edit_balance = client.sub_balance(db,res.client,res.cost)
             
             return res
         return False
@@ -184,7 +184,7 @@ def get_reservation(db,res_id):
         result = db.curs.fetchone()
         res = Reserve(result[1],result[2],result[3],result[4],result[5],result[6])
         res.id = result[0]
-        if result[8] != "Current":
+        if result[7] != "Current":
             res.cancel()
         return res
     
