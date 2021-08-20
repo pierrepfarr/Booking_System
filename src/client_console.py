@@ -1,12 +1,9 @@
-import sys
-from random import choice
-import json
 import argparse
 import pandas as pd
 import datetime as dt
 import regex as re
-from tabulate import tabulate
 
+from tabulate import tabulate
 from classes.interface import Interface
 from actions import fetch_login,actions
 
@@ -36,6 +33,7 @@ def main(logins,funds):
             print('\n')
             choice = interface.prompt_admin()
             print('\n')
+            
             action_input = interface.admin_choice_prompts[choice]()
             if choice == "Toggle Funds":
                 global funds_flag 

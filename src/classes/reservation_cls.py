@@ -5,7 +5,7 @@ from regex.regex import sub
 class Reserve:
     """ all the information pertaining to a reservation """
 
-    pricing = {'workshop': 99, 'mini microvac': 2000,
+    pricing = {'lab': 99, 'microcentrifuge': 2000,
                'irradiator': 2200, 'polymer extruder': 500,
                'high velocity crusher': 10000, '1.21 gigawatt lightning harvester': 8800}
 

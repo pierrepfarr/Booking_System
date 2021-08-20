@@ -1,10 +1,8 @@
-import sys
 import atexit
+import database as api
 
 from fastapi import FastAPI, Response
 from typing import Optional
-
-import database as api
 from models import Item, Client, Login
 
 app = FastAPI()

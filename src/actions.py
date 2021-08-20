@@ -1,7 +1,6 @@
 import datetime as dt
-import calendar
 import requests
-import random
+
 from requests.models import Response
 
 server = "http://127.0.0.1:8000"

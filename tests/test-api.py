@@ -4,9 +4,8 @@ import json
 
 from fastapi.testclient import TestClient
 
-sys.path.append('../Database')
-import api_lite as api
 sys.path.append('../src')
+import database as api
 from main import app
 sys.path.append('../src/classes')
 from reservation import Reserve

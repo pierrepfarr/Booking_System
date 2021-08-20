@@ -12,7 +12,7 @@ class Interface:
                      "4": "List Reservations", "5": "List Transactions", "6": "Show Balance", 
                      "7": "Add Balance", "8":"Edit Name"}
     
-    equipment_lst = ['workshop1','workshop2', 'workshop3','workshop4','mini microvac1', 'mini microvac2',
+    equipment_lst = ['lab1','lab2', 'lab3','lab4','microcentrifuge1', 'microcentrifuge2',
                      'irradiator1', 'irradiator2', 'polymer extruder1', 'polymer extruder2',
                      'high velocity crusher', '1.21 gigawatt lightning harvester']
 
@@ -430,6 +430,7 @@ class Interface:
     def check_date(self,date):
         try:
             dt_date = dt.datetime.strptime(date,"%Y-%m-%d").date()
+            
             if dt_date:
                 return True
         except:

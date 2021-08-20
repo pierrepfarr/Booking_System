@@ -30,7 +30,7 @@ def test_check_time(trial):
 def test_invalid_check_time(trial):
     assert not interface.check_time(trial)
 
-@pytest.mark.parametrize('trial',["2021-04-08","2020-12-01","1995-01-01"])
+@pytest.mark.parametrize('trial',["2021-09-08","2021-12-01","1995-01-01"])
 def test_check_date(trial):
     assert interface.check_date(trial)
 
@@ -38,7 +38,7 @@ def test_check_date(trial):
 def test_invalid_check_date(trial):
     assert not interface.check_date(trial)
 
-@pytest.mark.parametrize('trial',['client','admin','hold_admin'])
+@pytest.mark.parametrize('trial',['client','admin'])
 def test_check_role(trial):
     assert interface.check_role(trial)
 

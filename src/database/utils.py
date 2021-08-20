@@ -9,9 +9,9 @@ from collections import namedtuple
 sys.path.append('../src/classes')
 from reservation_cls import Reserve
 
-equipment_lst = ['workshop1','workshop2','workshop3','workshop4','"mini microvac1"','"mini microvac2"',
-                    'irradiator1', 'irradiator2', '"polymer extruder1"', '"polymer extruder2"',
-                    '"high velocity crusher"', '"1.21 gigawatt lightning harvester"']
+equipment_lst = ['lab1','lab2', 'lab3','lab4','microcentrifuge1', 'microcentrifuge2',
+                    'irradiator1', 'irradiator2', 'polymer extruder1', 'polymer extruder2',
+                    'high velocity crusher', '1.21 gigawatt lightning harvester']
 
 DB_FILE = "../src/reservations.db"
 
@@ -38,9 +38,9 @@ def open_db(database_file=DB_FILE):
     curs.execute(
         'CREATE TABLE IF NOT EXISTS clients (Name VARCHAR(140), Hash BLOB, Salt BLOB, Status TEXT, Balance REAL, Role TEXT,ID VARCHAR(140))')        
 
-    equipment_lst = ['workshop1','workshop2','workshop3','workshop4','"mini microvac1"','"mini microvac2"',
-                     'irradiator1', 'irradiator2', '"polymer extruder1"', '"polymer extruder2"',
-                     '"high velocity crusher"', '"1.21 gigawatt lightning harvester"']
+    equipment_lst = ['lab1','lab2', 'lab3','lab4','microcentrifuge1', 'microcentrifuge2',
+                        'irradiator1', 'irradiator2', '"polymer extruder1"', '"polymer extruder2"',
+                        '"high velocity crusher"', '"1.21 gigawatt lightning harvester"']
 
     for item in equipment_lst:
             curs.execute(
