@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 sys.path.append('../src')
 import database as api
 from main import app
+
 sys.path.append('../src/classes')
 from reservation import Reserve
 
@@ -28,7 +29,7 @@ def test_get_reservations_list_empty_lst(mocker):
 def test_get_reservations_list_nonempty_lst(mocker):
     expected = ['res1']
     mocker.patch(
-        'api_lite.list_all_reservations', 
+        'database.list_all_reservations', 
         return_value=expected
     )
     response = client.get("/reservations")
@@ -36,15 +37,15 @@ def test_get_reservations_list_nonempty_lst(mocker):
     assert response.status_code == 200
 
 def test_post_reservation(mocker):
-    expected = Reserve('Pierre','workshop1','2021-04-08','2021-04-10','13:00','14,00')
+    expected = Reserve('Pierre','lab1','2021-04-08','2021-04-10','13:00','14,00')
     expected.id = 'test'
     mocker.patch(
-        'api_lite.create_res', 
+        'database.create_res', 
         return_value=expected
     )       
     my_data = {
             "client": 'Pierre',
-            "request": 'workshop1',
+            "request": 'lab1',
             "create_date": '2021-04-08',
             "start_date": '2021-04-10',
             "res_start": '13:00',
@@ -59,22 +60,22 @@ def test_post_reservation(mocker):
 def test_delete_reservations(mocker):
     expected = True
     mocker.patch(
-        'api_lite.delete_res', 
+        'database.delete_res', 
         return_value=expected
     )   
     response = client.delete("/reservations/1") 
     assert response.json()['Message'] == ['The reservation was cancelled']
 
 def test_modify_reservations(mocker):
-    expected = Reserve('Pierre','workshop2','2021-04-08','2021-04-10','13:00','14,00')
+    expected = Reserve('Pierre','lab2','2021-04-08','2021-04-10','13:00','14,00')
     expected.id = 'test'
     mocker.patch(
-        'api_lite.modify_reservation', 
+        'database.modify_reservation', 
         return_value=expected
     )       
     my_data = {
             "client": 'Pierre',
-            "request": 'workshop2',
+            "request": 'lab2',
             "create_date": '2021-04-08',
             "start_date": '2021-04-10',
             "res_start": '13:00',
@@ -87,12 +88,12 @@ def test_modify_reservations(mocker):
     assert response.json()['Cost'] == ['99']
 
 def test_get_reservation(mocker):
-    expected = Reserve('Pierre','workshop1','2021-04-08','2021-04-10','13:00','14,00')
+    expected = Reserve('Pierre','lab1','2021-04-08','2021-04-10','13:00','14,00')
     expected.id = 'test'
     expected.refund = '0'
     
     mocker.patch(
-        'api_lite.get_reservation', 
+        'database.get_reservation', 
         return_value=expected
     )  
     response = client.get("/reservations/1")
@@ -105,7 +106,7 @@ def test_get_reservation_fail(mocker):
     expected = False
     
     mocker.patch(
-        'api_lite.get_reservation',
+        'database.get_reservation',
         return_value=expected
     )  
     response = client.get("/reservations/1")
@@ -116,7 +117,7 @@ def test_get_clients_list(mocker):
     expected = ['test_client']
     
     mocker.patch(
-        'api_lite.list_all_clients', 
+        'database.list_all_clients', 
         return_value=expected
     )  
     response = client.get("/clients")
@@ -127,7 +128,7 @@ def test_get_clients_list_empty(mocker):
     expected = []
     
     mocker.patch(
-        'api_lite.list_all_clients', 
+        'database.list_all_clients', 
         return_value=expected
     )  
     response = client.get("/clients")
@@ -138,7 +139,7 @@ def test_get_client_balance(mocker):
     expected = ['test',2000]
     
     mocker.patch(
-        'api_lite.get_client_balance', 
+        'database.get_client_balance', 
         return_value=expected
     )  
     response = client.get("/clients/1/?balance=true")
@@ -150,7 +151,7 @@ def test_get_client_balance_fail(mocker):
     expected = False
     
     mocker.patch(
-        'api_lite.get_client_balance', 
+        'database.get_client_balance', 
         return_value=expected
     )  
     response = client.get("/clients/1/?balance=true")
@@ -160,7 +161,7 @@ def test_get_client_balance_fail(mocker):
 def test_post_client(mocker):
     expected = True
     mocker.patch(
-        'api_lite.create_client', 
+        'database.create_client', 
         return_value=expected
     )  
     my_data = { "name":"Pierre",
@@ -177,7 +178,7 @@ def test_post_client(mocker):
 def test_post_client_fail(mocker):
     expected = False
     mocker.patch(
-        'api_lite.create_client', 
+        'database.create_client', 
         return_value=expected
     )  
     my_data = { "name":"Pierre",
@@ -194,7 +195,7 @@ def test_post_client_fail(mocker):
 def test_update_name(mocker):
     expected = True
     mocker.patch(
-        'api_lite.client_edit_name', 
+        'database.client_edit_name', 
         return_value=expected
     )  
     response = client.put("/clients/test/?new_name=test")
@@ -204,7 +205,7 @@ def test_update_name(mocker):
 def test_update_name_fail(mocker):
     expected = False
     mocker.patch(
-        'api_lite.client_edit_name', 
+        'database.client_edit_name', 
         return_value=expected
     )  
     response = client.put("/clients/1")
@@ -215,7 +216,7 @@ def test_update_add(mocker):
     expected = True
     
     mocker.patch(
-        'api_lite.client_add_balance', 
+        'database.add_balance', 
         return_value=expected
     )  
     response = client.put("/clients/1/?add=2000")
@@ -225,7 +226,7 @@ def test_update_add(mocker):
 def test_update_add_fail(mocker):
     expected = False
     mocker.patch(
-        'api_lite.client_add_balance', 
+        'database.add_balance', 
         return_value=expected
     )  
     response = client.put("/clients/1")
@@ -236,7 +237,7 @@ def test_update_sub(mocker):
     expected = True
     
     mocker.patch(
-        'api_lite.client_edit_name', 
+        'database.client_edit_name', 
         return_value=expected
     )  
     response = client.put("/clients/1/?sub=2000")
@@ -246,7 +247,7 @@ def test_update_sub(mocker):
 def test_update_sub_fail(mocker):
     expected = False
     mocker.patch(
-        'api_lite.client_edit_name', 
+        'database.client_edit_name', 
         return_value=expected
     )  
     response = client.put("/clients/1")
@@ -257,7 +258,7 @@ def test_list_all_client_res(mocker):
     expected = {'reservations':['test'],'totals':['0'],"refunds":['0'],"facility":['test_chi'],"status":["confirmed"]}
     
     mocker.patch(
-        'api_lite.list_all_client_reservations', 
+        'database.list_all_client_reservations', 
         return_value=expected
     )  
     response = client.get("/list/all/client/?client=test")
@@ -270,7 +271,7 @@ def test_list_all_transactions(mocker):
     expected = {'reservations':['test'],'totals':['0'],"refunds":['0'],"facility":['test_chi'],"status":["confirmed"]}
     
     mocker.patch(
-        'api_lite.list_all_transactions', 
+        'database.list_all_transactions', 
         return_value=expected
     )  
     response = client.get("/list/all/transactions")
@@ -282,7 +283,7 @@ def test_list_all_transactions(mocker):
 def test_list_client_nonempty_lst(mocker):
     expected = ['test_lst_value']
     mocker.patch(
-        'api_lite.list_client', 
+        'database.list_client', 
         return_value=expected
     )  
 
@@ -293,7 +294,7 @@ def test_list_client_nonempty_lst(mocker):
 def test_list_client_empty_lst(mocker):
     expected = []
     mocker.patch(
-        'api_lite.list_client', 
+        'database.list_client', 
         return_value=expected
     )  
     response = client.get("/list/range/client/2021-04-10/2021-04-11/?client=Test")
@@ -303,7 +304,7 @@ def test_list_client_empty_lst(mocker):
 def test_list_transactions_nonempty_lst(mocker):
     expected = {'reservations':['test'],'totals':['0'],"refunds":['0'],"facility":['test_chi'],"status":["confirmed"]}
     mocker.patch(
-        'api_lite.list_transactions', 
+        'database.list_transactions', 
         return_value=expected
     )  
     response = client.get("/list/range/transactions/2021-04-10/2021-04-11")
@@ -315,7 +316,7 @@ def test_list_transactions_nonempty_lst(mocker):
 def test_list_transactions_empty_lst(mocker):
     expected = []
     mocker.patch(
-        'api_lite.list_transactions', 
+        'database.list_transactions', 
         return_value=expected
     )  
     response = client.get("/list/range/transactions/2021-04-10/2021-04-11")
@@ -325,7 +326,7 @@ def test_list_transactions_empty_lst(mocker):
 def test_list_reservations_nonempty_lst(mocker):
     expected = ['test']
     mocker.patch(
-        'api_lite.list_reservations', 
+        'database.list_reservations', 
         return_value=expected
     )  
     response = client.get("/list/range/reservations/2021-04-10/2021-04-11")
@@ -335,96 +336,9 @@ def test_list_reservations_nonempty_lst(mocker):
 def test_list_reservations_empty_lst(mocker):
     expected = []
     mocker.patch(
-        'api_lite.list_reservations', 
+        'database.list_reservations', 
         return_value=expected
     )  
     response = client.get("/list/range/reservations/2021-04-10/2021-04-11")
     assert response.status_code == 200
     assert response.json()['Message'] == ["No Results Found"]
-
-def test_post_hold(mocker):
-    expected = True
-    mocker.patch(
-        'api_lite.create_hold', 
-        return_value=expected
-    )       
-    my_data = {
-            "username": 'team3',
-            "password": 'test',
-            "client_name":"Pierre",
-            "request": 'shop1',
-            "start_date": '2021-04-10',
-            "start_time": '13:00',
-            "end_time": '14:00'}
-
-    my_data = json.dumps(my_data)
-    response = client.post("/hold",data=my_data)
-    assert response.status_code == 200
-    assert response.json()['success'] == True
-    assert response.json()['message'] == "Your hold was placed"
-
-
-def test_post_hold_fail(mocker):
-    expected = False
-    mocker.patch(
-        'api_lite.create_hold', 
-        return_value=expected
-    )       
-    my_data = {
-            "username": 'team3',
-            "password": 'test',
-            "client_name":"Pierre",
-            "request": 'shop1',
-            "start_date": '2021-04-10',
-            "start_time": '13:00',
-            "end_time": '14:00'}
-
-    my_data = json.dumps(my_data)
-    response = client.post("/hold",data=my_data)
-    assert response.status_code == 200
-    assert response.json()['success'] == False
-    assert response.json()['message'] == "Your hold could not be placed"
-   
-
-def test_delete_hold(mocker):
-    expected = True
-    mocker.patch(
-        'api_lite.delete_hold', 
-        return_value=expected
-    )       
-    my_data = {
-            "username": 'team3',
-            "password": 'test',
-            "client_name":"Pierre",
-            "request": 'shop1',
-            "start_date": '2021-04-10',
-            "start_time": '13:00',
-            "end_time": '14:00'}
-
-    my_data = json.dumps(my_data)
-    response = client.delete("/hold",data=my_data)
-    assert response.status_code == 200
-    assert response.json()['success'] == True
-    assert response.json()['message'] == "Your hold was deleted"
-
-def test_delete_hold_fail(mocker):
-    expected = False
-    mocker.patch(
-        'api_lite.delete_hold', 
-        return_value=expected
-    )       
-    my_data = {
-            "username": 'team3',
-            "password": 'test',
-            "client_name":"Pierre",
-            "request": 'shop1',
-            "start_date": '2021-04-10',
-            "start_time": '13:00',
-            "end_time": '14:00'}
-
-    my_data = json.dumps(my_data)
-    response = client.delete("/hold",data=my_data)
-    assert response.status_code == 200
-    assert response.json()['success'] == False
-    assert response.json()['message'] == "Your hold could not be deleted"
-    
