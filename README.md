@@ -7,12 +7,12 @@ This is a simple reservation system with a command line interface that uses an A
 # Usage and How it Works
 
 ## Dependencies
-I am using poetry (https://python-poetry.org/docs/) to manage project packaging and dependency. Check out the lock file for further detail.
+I am using poetry (https://python-poetry.org/docs/) to manage project packages and dependencies. Check out the lock file for further detail.
 
 ## FastAPI (main.py)
 Run out of src/ uvicorn main:app --reload and uncomment/change the server location if you want to run locally
 
-If not you can run the program and it will try to interact with our linux machine.
+You can change the server address in actions.py
 
 ## Client_Console 
 
@@ -31,8 +31,8 @@ The manager must create new clients/users if they wish to make bookings for thos
 All dates should be input in "YYYY-MM-DD" form and all times should be input as 24hr times ex. 1:00 PM = 13:00
 
  list of request options  
-  - workshop 1-4 ex. workshop1 or workshop2
-  - mini microvac 1-2 ex. mini microvac1
+  - lab 1-4 ex. lab1 or lab2
+  - microcentrifuge 1-2 ex. microcentrifuge1
   - irradiator 1-2 ex. irradiator1
   - polymer extruder ex. polymer extruder1
   - high velocity crusher
@@ -42,7 +42,7 @@ If you wish to disable client logins at runtime run the file with the command ar
 
 If you wish to run the program allowing for remote hold request to be place use command args --allow_holds y
 
-## Database (api_lite.py)
+## Database (database folder)
 
 The business logic handles queries and that stores reservations information.
 
