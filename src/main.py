@@ -14,7 +14,7 @@ default_admin = api.create_client(db,admin_args)
 
 @app.get("/")
 async def read_root():
-    return {"message": "Welcome to MPCS Reservations"}
+    return {"message": "Welcome to Lab Booking System"}
 
 @app.put("/login")
 async def app_login(login: Login):
